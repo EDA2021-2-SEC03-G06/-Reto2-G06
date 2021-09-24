@@ -30,9 +30,51 @@ El controlador se encarga de mediar entre la vista y el modelo.
 """
 
 # Inicialización del Catálogo de libros
-
+def InitCatalog():
+    return model.NewCatalog()
 # Funciones para la carga de datos
+def loadArtist(catalogo):
+    booksfile = cf.data_dir + "Artists-utf8-large.csv"
+    file = csv.DictReader(open(booksfile,encoding = "utf-8"))
+    for Artist in file :
+        model.addArtist(catalogo,Artist)
 
+def loadArtwork(catalogo):
+    booksfile = cf.data_dir + "Artworks-utf8-large.csv"
+    file = csv.DictReader(open(booksfile,encoding = "utf-8"))
+    for Artwork in file :
+        model.addArtwork(catalogo,Artwork)
 # Funciones de ordenamiento
-
+def initordenamientodataAdquire(catalogo,ordenamiento,size):
+    if ordenamiento == 1:
+        orden = model.insertion_sort(catalogo["Obra"],size,model.compareDateAcquired)
+    elif ordenamiento == 2:
+        orden = model.merge_sort(catalogo["Obra"],size,model.compareDateAcquired)
+    elif ordenamiento == 3:
+        orden = model.quick_sort(catalogo["Obra"],size,model.compareDateAcquired)
+    elif ordenamiento == 4:
+        orden = model.shell_sort(catalogo["Obra"],size,model.compareDateAcquired)
+    return orden    
+def initnuevaexpo(catalogo,año_inicio,año_fin,area):
+    area_cm = area * (10000)
+    return model.nueva_expo(catalogo,año_inicio,año_fin,area_cm)
 # Funciones de consulta sobre el catálogo
+def initdateartist(año_inicio,año_final,catalogo):
+    return model.dateartist(año_inicio,año_final,catalogo)
+def initdateartwork(año_inicio,año_final,catalogo):
+    return model.dateArtwork(año_inicio,año_final,catalogo)
+def initArtworkvArtist(nombre_artista,catalogo):
+    return model.ArtworkvArtist(nombre_artista,catalogo)
+def initArtwokvNationality(catalogo):
+    return model.ArtworkvNacionality(catalogo)
+def initdepartmentArtworks(catalogo,departamento):
+    return model.departmentArtworks(catalogo,departamento)
+def encontrar_artista(catalogo,Constituen_ID):
+    ConstituenID = Constituen_ID.replace("]","")
+    ConstituenID = ConstituenID.replace("[","")
+    return model.encontrar_artista(catalogo,ConstituenID)
+def initArtwokvNationality(catalogo):
+    return model.ArtworkvNacionality(catalogo)
+def initdepartmentArtworks(catalogo,departamento):
+    return model.departmentArtworks(catalogo,departamento)
+
