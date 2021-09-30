@@ -402,6 +402,17 @@ def encontrar_artista(catalogo,constituent_ID):
 
 def antiguedad_tecntica(catalogo,tecnica,top):
     obras = mp.get(catalogo["mapa"],tecnica)
+    obras = obras["value"]
+    
+    obras_sorted = merge_sort(obras,lt.size(obras),compareData)
+    obras_sorted = obras_sorted[1]
+
+    n=1
+    aux = lt.newList()
+    while n<top:
+        lt.addLast(aux,lt.getElement(obras_sorted,n))
+        n+=1
+
     return obras
             
 
