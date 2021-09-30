@@ -46,6 +46,7 @@ def printMenu():
     print("6- Mover Obra de un departamento")
     print("7- Proponer una nueva exposición")
     print("8- Organizar una muestra de obras por fecha")
+    print("9- Listado cronologico de obras según una técnica")
     print("0- Salir")
 
 
@@ -286,10 +287,9 @@ while True:
         print(lt.getElement(catalogo["Obra"],lt.size(catalogo["Artista"])-2))
         print("Se cargaron " + str(lt.size(catalogo["Artista"]))+" artistas")
         print("Se cargaron " + str(lt.size(catalogo["Obra"]))+" obras")
-    
+
     elif int(inputs) == 2:
         print(ejecutar_dateartist(catalogo))
-    
     elif int(inputs) == 3:
         viewdateartwork()
     elif int(inputs) == 4:
@@ -302,6 +302,10 @@ while True:
         viewnuevaexpo()
     elif int(inputs) == 8:
         viewsort()
+    elif int(inputs) == 9:
+        tecnica = input("Bajo que técnica quiere revisar?: ")
+        top = int(input("Ingrese el top a consultar: "))
+        print(controller.initArtworkvMedium(catalogo,tecnica,top))
     else:
         sys.exit(0)
 sys.exit(0)

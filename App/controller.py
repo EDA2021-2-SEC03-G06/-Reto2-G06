@@ -75,6 +75,6 @@ def encontrar_artista(catalogo,Constituen_ID):
     return model.encontrar_artista(catalogo,ConstituenID)
 def initArtwokvNationality(catalogo):
     return model.ArtworkvNacionality(catalogo)
-def initdepartmentArtworks(catalogo,departamento):
-    return model.departmentArtworks(catalogo,departamento)
+def initArtworkvMedium(catalogo,tecnica,top):
+    return model.antiguedad_tecntica(catalogo,tecnica,top)
 

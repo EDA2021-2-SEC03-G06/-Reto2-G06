@@ -29,6 +29,7 @@ from os import replace
 from DISClib.DataStructures.arraylist import addLast, getElement, size
 import config as cf
 from DISClib.ADT import list as lt
+from DISClib.ADT import map as mp
 from DISClib.Algorithms.Sorting import insertionsort as ins
 from DISClib.Algorithms.Sorting import mergesort as ms
 from DISClib.Algorithms.Sorting import quicksort as qs
@@ -47,7 +48,8 @@ los mismos.
 # Construccion de modelos
 def NewCatalog():
     catalogo = {"Artista":None,
-                "Obra": None}
+                "Obra": None,
+                "mapa": mp.newMap()}
     catalogo["Artista"] = lt.newList()
     catalogo["Obra"] = lt.newList()
     return catalogo
@@ -56,6 +58,29 @@ def addArtist(catalogo,Artist):
     lt.addLast(catalogo["Artista"],Artist)
 def addArtwork(catalogo,Artwork):
     lt.addLast(catalogo["Obra"],Artwork)
+    mp.put(catalogo["mapa"],Artwork["Medium"],Artwork)
+    
+    if mp.contains(catalogo["mapa"],Artwork["Medium"])==False:
+        obras = lt.newList()
+        lt.addLast(obras,Artwork)
+        mp.put(catalogo["mapa"],Artwork["Medium"],obras)
+    
+    else:
+        tupla = mp.get(catalogo["mapa"],Artwork["Medium"])
+        
+        
+        for i in tupla["value"]:
+            if i != "first":
+                aux = lt.newList()
+                lt.addLast(aux,tupla["value"])
+            else:
+                aux = tupla["value"]
+            break
+
+        lt.addLast(aux,Artwork)
+        mp.put(catalogo["mapa"],Artwork["Medium"],aux)
+        
+    
 # Funciones para creacion de datos
 def ArtworkvArtist(nombre_artista,catalogo):
     obras_artista = {}
@@ -374,6 +399,10 @@ def encontrar_artista(catalogo,constituent_ID):
     artista = lt.getElement(catalogo["Artista"],posicion)["DisplayName"]
     return artista
 
+
+def antiguedad_tecntica(catalogo,tecnica,top):
+    obras = mp.get(catalogo["mapa"],tecnica)
+    return obras
             
 
 # Funciones utilizadas para comparar elementos dentro de una lista
