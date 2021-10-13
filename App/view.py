@@ -268,6 +268,10 @@ def viewsort():
     time, sorted_list = controller.initordenamientodataAdquire(catalogo,ordenamiento,size)
     print("El resultado fue:\n",sorted_list)
     print("El proceso tardo: ", time, "ms")
+def viewobranacionalidad():
+    nacionalidad = input("Ingrese la nacionalidad que le interesa")
+    tamaño = controller.initobra_nacionalidad(catalogo,nacionalidad)
+    print("De esa nacionalidad hay: ",tamaño)
 """
 Menu principal
 """
@@ -279,6 +283,9 @@ while True:
         catalogo = controller.InitCatalog()
         controller.loadArtist(catalogo)
         controller.loadArtwork(catalogo)
+        controller.loadNacionality(catalogo)
+        print(catalogo["Nacionalidad"])
+        """
         print(lt.getElement(catalogo["Artista"],lt.size(catalogo["Artista"])))
         print(lt.getElement(catalogo["Artista"],lt.size(catalogo["Artista"])-1))
         print(lt.getElement(catalogo["Artista"],lt.size(catalogo["Artista"])-2))
@@ -287,7 +294,7 @@ while True:
         print(lt.getElement(catalogo["Obra"],lt.size(catalogo["Artista"])-2))
         print("Se cargaron " + str(lt.size(catalogo["Artista"]))+" artistas")
         print("Se cargaron " + str(lt.size(catalogo["Obra"]))+" obras")
-
+        """
     elif int(inputs) == 2:
         print(ejecutar_dateartist(catalogo))
     elif int(inputs) == 3:
@@ -306,6 +313,8 @@ while True:
         tecnica = input("Bajo que técnica quiere revisar?: ")
         top = int(input("Ingrese el top a consultar: "))
         print(controller.initArtworkvMedium(catalogo,tecnica,top))
+    elif int(inputs) == 10:
+        viewobranacionalidad()
     else:
         sys.exit(0)
 sys.exit(0)

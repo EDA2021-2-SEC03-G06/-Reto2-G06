@@ -44,6 +44,15 @@ def loadArtwork(catalogo):
     file = csv.DictReader(open(booksfile,encoding = "utf-8"))
     for Artwork in file :
         model.addArtwork(catalogo,Artwork)
+
+def loadNacionality(catalogo):
+    booksfile = cf.data_dir + "Artworks-utf8-small.csv"
+    file = csv.DictReader(open(booksfile,encoding = "utf-8"))
+    contador = 1
+    for Artwork in file :
+        model.addNacionality(catalogo,Artwork)
+        print(contador)
+        contador += 1
 # Funciones de ordenamiento
 def initordenamientodataAdquire(catalogo,ordenamiento,size):
     if ordenamiento == 1:
@@ -78,3 +87,5 @@ def initArtwokvNationality(catalogo):
 def initArtworkvMedium(catalogo,tecnica,top):
     return model.antiguedad_tecntica(catalogo,tecnica,top)
 
+def initobra_nacionalidad(catalogo,nacionalidad):
+    return model.obras_nacionalidad(catalogo,nacionalidad)

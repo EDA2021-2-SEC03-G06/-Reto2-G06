@@ -49,9 +49,11 @@ los mismos.
 def NewCatalog():
     catalogo = {"Artista":None,
                 "Obra": None,
-                "mapa": mp.newMap()}
-    catalogo["Artista"] = lt.newList()
-    catalogo["Obra"] = lt.newList()
+                "mapa": mp.newMap(),
+                "Nacionalidad" : None }
+    catalogo["Artista"] = lt.newList(datastructure="ARRAY_LIST")    
+    catalogo["Obra"] = lt.newList(datastructure="ARRAY_LIST")
+    catalogo["Nacionalidad"] = mp.newMap()
     return catalogo
 # Funciones para agregar informacion al catalogo
 def addArtist(catalogo,Artist):
@@ -79,7 +81,24 @@ def addArtwork(catalogo,Artwork):
 
         lt.addLast(aux,Artwork)
         mp.put(catalogo["mapa"],Artwork["Medium"],aux)
-        
+    
+def addNacionality(catalogo,obra):
+    artista = obra["ConstituentID"]
+    artista = artista.replace("[","")
+    artista = artista.replace("]","")
+    posicion = 1
+    while posicion < lt.size(catalogo["Artista"]) and artista != lt.getElement(catalogo["Artista"],posicion)["ConstituentID"]:
+        posicion += 1
+    print("encontrado")
+    print("posicion :", posicion)
+    nacionalidad = lt.getElement(catalogo["Artista"],posicion)["Nationality"]
+    if mp.contains(catalogo["Nacionalidad"],nacionalidad):
+        obras = mp.get(catalogo["Nacionalidad"],nacionalidad)["value"]
+        lt.addLast(obras,obra)
+    else:
+        obras = lt.newList(datastructure="ARRAY_LIST")
+        lt.addLast(obras,obra)
+    mp.put(catalogo["Nacionalidad"],nacionalidad,obras)
     
 # Funciones para creacion de datos
 def ArtworkvArtist(nombre_artista,catalogo):
@@ -182,7 +201,9 @@ def ArtworkvNacionality(catalogo):
     
     return orden, obras_top
 
-
+def obras_nacionalidad(catalogo,nacionalidad):
+    obras = mp.get(catalogo["Nacionalidad"],nacionalidad)["value"]
+    return lt.size(obras)
 # Funciones de consulta
 def dateartist(año_inicio,año_final,catalogo):
     aux = catalogo["Artista"]
