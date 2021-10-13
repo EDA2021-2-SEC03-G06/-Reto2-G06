@@ -283,7 +283,6 @@ while True:
         catalogo = controller.InitCatalog()
         controller.loadArtist(catalogo)
         controller.loadArtwork(catalogo)
-        controller.loadNacionality(catalogo)
         print(catalogo["Nacionalidad"])
         """
         print(lt.getElement(catalogo["Artista"],lt.size(catalogo["Artista"])))

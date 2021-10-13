@@ -49,56 +49,57 @@ los mismos.
 def NewCatalog():
     catalogo = {"Artista":None,
                 "Obra": None,
-                "mapa": mp.newMap(),
+                "medio": mp.newMap(),
                 "Nacionalidad" : None }
-    catalogo["Artista"] = lt.newList(datastructure="ARRAY_LIST")    
-    catalogo["Obra"] = lt.newList(datastructure="ARRAY_LIST")
+    catalogo["Artista"] = mp.newMap()  
+    catalogo["Obra"] = mp.newMap()
     catalogo["Nacionalidad"] = mp.newMap()
     return catalogo
 # Funciones para agregar informacion al catalogo
 def addArtist(catalogo,Artist):
-    lt.addLast(catalogo["Artista"],Artist)
+    mp.put(catalogo["Artista"],Artist["ConstituentID"],Artist)
 def addArtwork(catalogo,Artwork):
-    lt.addLast(catalogo["Obra"],Artwork)
-    mp.put(catalogo["mapa"],Artwork["Medium"],Artwork)
+    mp.put(catalogo["Obra"],Artwork["ObjectID"],Artwork)
+
+
+    """
+    Creación mapa de obras por su nacionalidad
+    """
+    artistas = Artwork["ConstituentID"]
+    artistas = artistas.replace(']','').replace(' ','').replace('[','').split(',')
+    print(artistas)
+    for id in artistas:
+        artista = mp.get(catalogo["Artista"],id)
+        nacionalidad = artista["value"]["Nationality"]
+        print(nacionalidad)
+
+        if mp.contains(catalogo["Nacionalidad"],nacionalidad)==False:
+            obras = lt.newList()
+            lt.addLast(obras,Artwork)
+            mp.put(catalogo["Nacionalidad"],nacionalidad,obras)
     
-    if mp.contains(catalogo["mapa"],Artwork["Medium"])==False:
+        else:
+            tupla = mp.get(catalogo["Nacionalidad"],nacionalidad)
+            lista = tupla["value"]
+            lt.addLast(lista,Artwork)
+            mp.put(catalogo["Nacionalidad"],Artwork["Medium"],lista)
+
+
+
+    """
+    Creación mapa de obras por su medio
+    """
+    if mp.contains(catalogo["medio"],Artwork["Medium"])==False:
         obras = lt.newList()
         lt.addLast(obras,Artwork)
-        mp.put(catalogo["mapa"],Artwork["Medium"],obras)
+        mp.put(catalogo["medio"],Artwork["Medium"],obras)
     
     else:
-        tupla = mp.get(catalogo["mapa"],Artwork["Medium"])
-        
-        
-        for i in tupla["value"]:
-            if i != "first":
-                aux = lt.newList()
-                lt.addLast(aux,tupla["value"])
-            else:
-                aux = tupla["value"]
-            break
-
-        lt.addLast(aux,Artwork)
-        mp.put(catalogo["mapa"],Artwork["Medium"],aux)
+        tupla = mp.get(catalogo["medio"],Artwork["Medium"])
+        lista = tupla["value"]
+        lt.addLast(lista,Artwork)
+        mp.put(catalogo["medio"],Artwork["Medium"],lista)
     
-def addNacionality(catalogo,obra):
-    artista = obra["ConstituentID"]
-    artista = artista.replace("[","")
-    artista = artista.replace("]","")
-    posicion = 1
-    while posicion < lt.size(catalogo["Artista"]) and artista != lt.getElement(catalogo["Artista"],posicion)["ConstituentID"]:
-        posicion += 1
-    print("encontrado")
-    print("posicion :", posicion)
-    nacionalidad = lt.getElement(catalogo["Artista"],posicion)["Nationality"]
-    if mp.contains(catalogo["Nacionalidad"],nacionalidad):
-        obras = mp.get(catalogo["Nacionalidad"],nacionalidad)["value"]
-        lt.addLast(obras,obra)
-    else:
-        obras = lt.newList(datastructure="ARRAY_LIST")
-        lt.addLast(obras,obra)
-    mp.put(catalogo["Nacionalidad"],nacionalidad,obras)
     
 # Funciones para creacion de datos
 def ArtworkvArtist(nombre_artista,catalogo):
