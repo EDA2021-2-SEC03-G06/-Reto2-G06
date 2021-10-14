@@ -23,7 +23,7 @@
 import config as cf
 import model
 import csv
-
+import time as chronos
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -44,7 +44,27 @@ def loadArtwork(catalogo):
     file = csv.DictReader(open(booksfile,encoding = "utf-8"))
     for Artwork in file :
         model.addArtwork(catalogo,Artwork)
+    return
 
+def loadNacionality(catalogo):
+    booksfile = cf.data_dir + "Artworks-utf8-large.csv"
+    file = csv.DictReader(open(booksfile,encoding = "utf-8"))
+    start_time = chronos.process_time()
+    for Artwork in file :
+        model.addNacionality(catalogo,Artwork)
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    return time
+
+def loadMedium(catalogo):
+    booksfile = cf.data_dir + "Artworks-utf8-large.csv"
+    file = csv.DictReader(open(booksfile,encoding = "utf-8"))
+    start_time = chronos.process_time()
+    for Artwork in file :
+        model.addMedio(catalogo,Artwork)
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    return time
 # Funciones de ordenamiento
 def initordenamientodataAdquire(catalogo,ordenamiento,size):
     if ordenamiento == 1:

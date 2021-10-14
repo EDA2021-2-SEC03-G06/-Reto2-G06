@@ -49,11 +49,11 @@ los mismos.
 def NewCatalog():
     catalogo = {"Artista":None,
                 "Obra": None,
-                "medio": mp.newMap(),
+                "medio": mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Nacionalidad" : None }
     catalogo["Artista"] = mp.newMap()  
     catalogo["Obra"] = mp.newMap()
-    catalogo["Nacionalidad"] = mp.newMap()
+    catalogo["Nacionalidad"] = mp.newMap(maptype='CHAINING',loadfactor=8.00)
     return catalogo
 # Funciones para agregar informacion al catalogo
 def addArtist(catalogo,Artist):
@@ -61,17 +61,15 @@ def addArtist(catalogo,Artist):
 def addArtwork(catalogo,Artwork):
     mp.put(catalogo["Obra"],Artwork["ObjectID"],Artwork)
 
-
+def addNacionality(catalogo,Artwork):
     """
     Creación mapa de obras por su nacionalidad
     """
     artistas = Artwork["ConstituentID"]
     artistas = artistas.replace(']','').replace(' ','').replace('[','').split(',')
-    print(artistas)
     for id in artistas:
         artista = mp.get(catalogo["Artista"],id)
         nacionalidad = artista["value"]["Nationality"]
-        print(nacionalidad)
 
         if mp.contains(catalogo["Nacionalidad"],nacionalidad)==False:
             obras = lt.newList()
@@ -85,7 +83,7 @@ def addArtwork(catalogo,Artwork):
             mp.put(catalogo["Nacionalidad"],Artwork["Medium"],lista)
 
 
-
+def addMedio(catalogo,Artwork):
     """
     Creación mapa de obras por su medio
     """

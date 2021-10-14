@@ -283,7 +283,10 @@ while True:
         catalogo = controller.InitCatalog()
         controller.loadArtist(catalogo)
         controller.loadArtwork(catalogo)
-        print(catalogo["Nacionalidad"])
+        time1 = controller.loadNacionality(catalogo)
+        time2 = controller.loadMedium(catalogo)
+        print("se demoro cargando la nacionalidad ", time1)
+        print("se demoro cargando el Medio ",time2)
         """
         print(lt.getElement(catalogo["Artista"],lt.size(catalogo["Artista"])))
         print(lt.getElement(catalogo["Artista"],lt.size(catalogo["Artista"])-1))
