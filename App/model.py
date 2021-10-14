@@ -236,10 +236,15 @@ def dateartist(año_inicio,año_final,catalogo):
 def dateArtwork(fecha_inicio,fecha_fin,catalogo):
     obras_rango = mp.newMap()
     obras_purchase = 0
+    obras_en_rango = 0
     for llave in mp.keySet(catalogo["Obras"]):
-    obra = mp.get(catalogo["Obra"],llave)["value"]
-    if obra["DateAcquired"] != "" and dt.datetime.strptime(obra["DateAcquired"],"%Y-%m-%d") > dt.datetime.strptime(fecha_inicio,"%Y-%m-%d") and dt.datetime.strptime(obra["DateAcquired"],"%Y-%m-%d") < dt.datetime.strptime(fecha_fin,"%Y-%m-%d"):
-        mp.put(obras_rango,llave,obra)
+        obra = mp.get(catalogo["Obra"],llave)["value"]
+        if obra["DateAcquired"] != "" and dt.datetime.strptime(obra["DateAcquired"],"%Y-%m-%d") > dt.datetime.strptime(fecha_inicio,"%Y-%m-%d") and dt.datetime.strptime(obra["DateAcquired"],"%Y-%m-%d") < dt.datetime.strptime(fecha_fin,"%Y-%m-%d"):
+            mp.put(obras_rango,llave,obra)
+            obras_en_rango += 1
+            if obra["CreditLine"] == "Purchase":
+                obras_purchase += 1
+    
 
     """
     while posicion < lt.size(catalogo["Obra"]):
