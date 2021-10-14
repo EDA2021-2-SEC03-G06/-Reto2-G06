@@ -183,8 +183,8 @@ def ejecutar_departmentartworks(catalogo):
 
 catalogo = None
 def viewdateartwork():
-            año_inicio = int(input("Ingrese el año en el que desea iniciar: "))
-            año_final = int(input("Ingrese el año en el que desea terminar: "))
+            año_inicio = input("Ingrese el año en el que desea iniciar: ")
+            año_final = input("Ingrese el año en el que desea terminar: ")
             total_obras, purchase, primeras_3,ultimas_3 = controller.initdateartwork(año_inicio,año_final,catalogo)
             print("En esas fechas ubo: ",total_obras," obras")
             print("De esas obras ",purchase," fueron compradas")
