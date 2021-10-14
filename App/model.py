@@ -234,9 +234,14 @@ def dateartist(año_inicio,año_final,catalogo):
 
 
 def dateArtwork(fecha_inicio,fecha_fin,catalogo):
-    obras_rango = lt.newList()
+    obras_rango = mp.newMap()
     obras_purchase = 0
-    posicion = 0
+    for llave in mp.keySet(catalogo["Obras"]):
+    obra = mp.get(catalogo["Obra"],llave)["value"]
+    if obra["DateAcquired"] != "" and dt.datetime.strptime(obra["DateAcquired"],"%Y-%m-%d") > dt.datetime.strptime(fecha_inicio,"%Y-%m-%d") and dt.datetime.strptime(obra["DateAcquired"],"%Y-%m-%d") < dt.datetime.strptime(fecha_fin,"%Y-%m-%d"):
+        mp.put(obras_rango,llave,obra)
+
+    """
     while posicion < lt.size(catalogo["Obra"]):
         obra = lt.getElement(catalogo["Obra"],posicion)
         fecha = obra["Date"]
@@ -260,6 +265,7 @@ def dateArtwork(fecha_inicio,fecha_fin,catalogo):
     lt.addLast(primeras_3,lt.getElement(obras_sorted,1))
     lt.addLast(primeras_3,lt.getElement(obras_sorted,0))
     return(tamaño, obras_purchase,primeras_3,ultimos_3)
+    """
 
 
 def nationality_artist(catalogo,id):
