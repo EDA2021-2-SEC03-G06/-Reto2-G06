@@ -23,6 +23,7 @@
 import config as cf
 import model
 import csv
+import datetime as dt
 import time as chronos
 
 """
@@ -42,26 +43,13 @@ def loadArtist(catalogo):
 def loadArtwork(catalogo):
     booksfile = cf.data_dir + "Artworks-utf8-large.csv"
     file = csv.DictReader(open(booksfile,encoding = "utf-8"))
+    start_time = chronos.process_time()
     for Artwork in file :
         model.addArtwork(catalogo,Artwork)
-    return
-
-def loadNacionality(catalogo):
-    booksfile = cf.data_dir + "Artworks-utf8-large.csv"
-    file = csv.DictReader(open(booksfile,encoding = "utf-8"))
-    start_time = chronos.process_time()
-    for Artwork in file :
         model.addNacionality(catalogo,Artwork)
-    stop_time = chronos.process_time()
-    time = (stop_time - start_time)*1000
-    return time
-
-def loadMedium(catalogo):
-    booksfile = cf.data_dir + "Artworks-utf8-large.csv"
-    file = csv.DictReader(open(booksfile,encoding = "utf-8"))
-    start_time = chronos.process_time()
-    for Artwork in file :
         model.addMedio(catalogo,Artwork)
+        model.addDataAcquired(catalogo,Artwork)
+        model.addArtworkxArtist(catalogo,Artwork)
     stop_time = chronos.process_time()
     time = (stop_time - start_time)*1000
     return time
@@ -83,7 +71,9 @@ def initnuevaexpo(catalogo,año_inicio,año_fin,area):
 def initdateartist(año_inicio,año_final,catalogo):
     return model.dateartist(año_inicio,año_final,catalogo)
 def initdateartwork(año_inicio,año_final,catalogo):
-    return model.dateArtwork(año_inicio,año_final,catalogo)
+    año_I = dt.datetime.strptime(año_inicio,"%Y-%m-%d")
+    año_F = dt.datetime.strptime(año_final,"%Y-%m-%d")
+    return model.dateArtwork(año_I,año_F,catalogo)
 def initArtworkvArtist(nombre_artista,catalogo):
     return model.ArtworkvArtist(nombre_artista,catalogo)
 def initArtwokvNationality(catalogo):

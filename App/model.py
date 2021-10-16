@@ -34,6 +34,8 @@ from DISClib.Algorithms.Sorting import insertionsort as ins
 from DISClib.Algorithms.Sorting import mergesort as ms
 from DISClib.Algorithms.Sorting import quicksort as qs
 from DISClib.Algorithms.Sorting import shellsort as ss
+from DISClib.DataStructures import mapentry as ma
+from datetime import timedelta as td
 import datetime as dt
 import time as chronos
 import math
@@ -50,7 +52,9 @@ def NewCatalog():
     catalogo = {"Artista":None,
                 "Obra": None,
                 "medio": mp.newMap(maptype='CHAINING',loadfactor=8.00),
-                "Nacionalidad" : None }
+                "Nacionalidad" : None,
+                "Adquisicion" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
+                "Obras Artista" : mp.newMap(maptype='CHAINING',loadfactor=8.00) }
     catalogo["Artista"] = mp.newMap()  
     catalogo["Obra"] = mp.newMap()
     catalogo["Nacionalidad"] = mp.newMap(maptype='CHAINING',loadfactor=8.00)
@@ -98,9 +102,76 @@ def addMedio(catalogo,Artwork):
         lt.addLast(lista,Artwork)
         mp.put(catalogo["medio"],Artwork["Medium"],lista)
     
-    
+def addDataAcquired(catalogo,Artwork):
+    """
+    Creación mapa de obras por su fecha de adquisicion
+    """
+    if Artwork["DateAcquired"] != "":
+        fecha = dt.datetime.strptime(Artwork["DateAcquired"],"%Y-%m-%d")
+    else:
+        fecha = dt.datetime.strptime("9999-12-31","%Y-%m-%d")
+    if mp.contains(catalogo["Adquisicion"],fecha)==False:
+        obras = lt.newList()
+        lt.addLast(obras,Artwork)
+    else:
+        tupla = mp.get(catalogo["medio"],Artwork["Medium"])
+        obras = ma.getValue(tupla)
+        lt.addLast(obras,Artwork)
+    mp.put(catalogo["Adquisicion"],fecha,obras)
+
+def addArtworkxArtist(catalogo,Artwork):
+    artistas = Artwork["ConstituentID"]
+    artistas = artistas.replace(']','').replace(' ','').replace('[','').split(',')
+    for id in artistas:
+        artista = ma.getValue(mp.get(catalogo["Artista"],id))
+        nombre = artista["DisplayName"]
+
+        if mp.contains(catalogo["Obras Artista"],nombre)==False:
+            obras = lt.newList()
+            lt.addLast(obras,Artwork)
+        else:
+            tupla = mp.get(catalogo["Obras Artista"],nombre)
+            obras = ma.getValue(tupla)
+            lt.addLast(obras,Artwork)
+        mp.put(catalogo["Obras Artista"],nombre,obras)
 # Funciones para creacion de datos
 def ArtworkvArtist(nombre_artista,catalogo):
+    medios = mp.newMap()
+    if mp.contains(catalogo["Obras Artista"],nombre_artista):
+        obras = ma.getValue(mp.get(catalogo["Obras Artista"],nombre_artista))
+        obras_totales = lt.size(obras)
+        for obra in lt.iterator(obras):
+            if mp.contains(medios,obra["Medium"])==False:
+                obras_medio = lt.newList(datastructure="ARRAY_LIST")
+            else:
+                tupla = mp.get(obras,obra["Medium"])
+                obras_medio = ma.getValue(tupla)
+            lt.addLast(obras_medio,obra)
+            mp.put(medios,obra["Medium"],obras_medio)
+        total_medios = mp.size(medios)
+        llaves = mp.keySet(medios)
+        mayor = ""
+        n_mayor = 0
+        for medio in lt.iterator(llaves):
+            if lt.size(ma.getValue(mp.get(medios,medio))) > n_mayor:
+                mayor = medio
+                n_mayor = lt.size(ma.getValue(mp.get(medios,medio)))
+        if n_mayor > 3:
+            primeras_3 = lt.newList(datastructure="ARRAY_LIST")
+            for posicion in range(1,4):
+                lt.addLast(primeras_3,lt.getElement(ma.getValue(mp.get(medios,mayor)),posicion))
+            ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
+            for posicion in range(lt.size(obras)-3,lt.size(obras)):
+                lt.addLast(ultimas_3,lt.getElement(ma.getValue(mp.get(medios,mayor)),posicion))
+        else:
+            primeras_3 = ma.getValue(mp.get(medios,mayor))
+            ultimas_3 = ma.getValue(mp.get(medios,mayor))
+        return (obras_totales,total_medios,mayor,primeras_3,ultimas_3)
+    else:
+        primeras_3 = lt.newList(datastructure="ARRAY_LIST")
+        ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
+        return(0,0,"No uso medios")
+    """
     obras_artista = {}
     total_obras = 0
     total_medios = 0
@@ -132,7 +203,7 @@ def ArtworkvArtist(nombre_artista,catalogo):
             medio_n = lt.size(obras_artista[llave])
             nombre = llave
     return (total_obras,total_medios,nombre,obras_artista[nombre])
-    
+    """
 
 
 def ArtworkvNacionality(catalogo):
@@ -234,46 +305,28 @@ def dateartist(año_inicio,año_final,catalogo):
 
 
 def dateArtwork(fecha_inicio,fecha_fin,catalogo):
-    obras_rango = mp.newMap()
-    obras_purchase = 0
-    obras_en_rango = 0
-    for llave in mp.keySet(catalogo["Obra"]):
-        obra = mp.get(catalogo["Obra"],llave)
-        print(llave)
-        print(obra)
-        chronos.sleep(10)
-        if obra != None and obra["value"]["DateAcquired"] != "" and dt.datetime.strptime(obra["value"]["DateAcquired"],"%Y-%m-%d") > dt.datetime.strptime(fecha_inicio,"%Y-%m-%d") and dt.datetime.strptime(obra["DateAcquired"],"%Y-%m-%d") < dt.datetime.strptime(fecha_fin,"%Y-%m-%d"):
-            print(obra)
-            mp.put(obras_rango,llave,obra)
-            obras_en_rango += 1
-            if obra["CreditLine"] == "Purchase":
-                obras_purchase += 1
-
-    """
-    while posicion < lt.size(catalogo["Obra"]):
-        obra = lt.getElement(catalogo["Obra"],posicion)
-        fecha = obra["Date"]
-        if fecha == "":
-            fecha = -1
-        if int(fecha) > fecha_inicio and int(fecha) < fecha_fin:
-            lt.addLast(obras_rango,obra)
-            if obra["CreditLine"] == "Purchase":
-                obras_purchase += 1
-        posicion += 1
-    tamaño = lt.size(obras_rango)
-    print("entrando en la parte dura: ")
-    obras_sorted = merge_sort(obras_rango,tamaño,compareData)
-    obras_sorted = obras_sorted[1]
-    primeras_3 = lt.newList()
-    lt.addLast(primeras_3,lt.getElement(obras_sorted,lt.size(obras_sorted)))
-    lt.addLast(primeras_3,lt.getElement(obras_sorted,lt.size(obras_sorted)-1))
-    lt.addLast(primeras_3,lt.getElement(obras_sorted,lt.size(obras_sorted)-2))
-    ultimos_3 = lt.newList()
-    lt.addLast(primeras_3,lt.getElement(obras_sorted,2))
-    lt.addLast(primeras_3,lt.getElement(obras_sorted,1))
-    lt.addLast(primeras_3,lt.getElement(obras_sorted,0))
-    return(tamaño, obras_purchase,primeras_3,ultimos_3)
-    """
+    fecha = fecha_inicio
+    obras = lt.newList(datastructure="ARRAY_LIST")
+    purchase = 0
+    num_obras = 0
+    while fecha <= fecha_fin:
+        adquisiciones = mp.get(catalogo["Adquisicion"],fecha)
+        if adquisiciones != None:
+            adquisiciones = ma.getValue(adquisiciones)
+            for obra in lt.iterator(adquisiciones):
+                lt.addLast(obras,obra)
+                if obra["CreditLine"] == "Purchase":
+                    purchase += 1
+            num_obras += lt.size(adquisiciones)
+        fecha += dt.timedelta(1,0,0)
+    
+    primeras_3 = lt.newList(datastructure="ARRAY_LIST")
+    for posicion in range(1,4):
+        lt.addLast(primeras_3,lt.getElement(obras,posicion))
+    ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
+    for posicion in range(lt.size(obras)-3,lt.size(obras)):
+        lt.addLast(ultimas_3,lt.getElement(obras,posicion))
+    return (num_obras, purchase, primeras_3,ultimas_3)
 
 
 def nationality_artist(catalogo,id):

@@ -189,41 +189,39 @@ def viewdateartwork():
             print("En esas fechas ubo: ",total_obras," obras")
             print("De esas obras ",purchase," fueron compradas")
             print("¡¡PRIMEROS 3!!")
-            posicion = 1
-            while posicion <= lt.size(primeras_3):
-                obra = lt.getElement(primeras_3,posicion)
+            for obra in lt.iterator(primeras_3):
                 print("*"*50)
                 print("Titulo : ", obra["Title"])
                 print("Fecha : ", obra["Date"])
                 print("Medio : ", obra["Medium"])
                 print("Dimensiones : ",obra["Dimensions"])
-                posicion += 1
-            posicion = 1
             print("¡¡ULTIMAS 3!!")
-            while posicion <= lt.size(ultimas_3):
-                obra = lt.getElement(ultimas_3,posicion)
+            for obra in lt.iterator(ultimas_3):
                 print("*"*50)
                 print("Titulo : ",obra["Title"])
                 print("Fecha : ",obra["Date"])
                 print("Medio : ",obra["Medium"])
                 print("Dimensiones : ",obra["Dimensions"])
-                posicion += 1
 
 def viewartworkvartist():
             nombre_artista = input("Ingrese el nombre del artista: ")
-            total_obras,total_tecnicas,tecnica_usada,obras_tecnica = controller.initArtworkvArtist(nombre_artista,catalogo)
+            total_obras,total_tecnicas,tecnica_usada,primeras_3,ultimas_3 = controller.initArtworkvArtist(nombre_artista,catalogo)
             print(nombre_artista," hizo ",total_obras," obras")
             print(nombre_artista," uso ", total_tecnicas," tecnicas")
             print(nombre_artista," usaba mayormente ",tecnica_usada," como tecnica")
-            posicion = 0
-            while posicion < lt.size(obras_tecnica):
-                obra = lt.getElement(obras_tecnica,posicion)
-                print("*"*25)
+            for obra in lt.iterator(primeras_3):
+                print("*"*50)
+                print("Titulo : ", obra["Title"])
+                print("Fecha : ", obra["Date"])
+                print("Medio : ", obra["Medium"])
+                print("Dimensiones : ",obra["Dimensions"])
+            print("¡¡ULTIMAS 3!!")
+            for obra in lt.iterator(ultimas_3):
+                print("*"*50)
                 print("Titulo : ",obra["Title"])
                 print("Fecha : ",obra["Date"])
                 print("Medio : ",obra["Medium"])
                 print("Dimensiones : ",obra["Dimensions"])
-                posicion += 1
 
 def viewnuevaexpo():
     año_inicio = int(input("En que año desea iniciar: "))
@@ -282,11 +280,9 @@ while True:
         print("Cargando información de los archivos ....")
         catalogo = controller.InitCatalog()
         controller.loadArtist(catalogo)
-        controller.loadArtwork(catalogo)
-        time1 = controller.loadNacionality(catalogo)
-        time2 = controller.loadMedium(catalogo)
-        print("se demoro cargando la nacionalidad ", time1)
-        print("se demoro cargando el Medio ",time2)
+        time = controller.loadArtwork(catalogo)
+        print("Se cargaron todos los datos")
+        print("Se demoro: ", time)
         """
         print(lt.getElement(catalogo["Artista"],lt.size(catalogo["Artista"])))
         print(lt.getElement(catalogo["Artista"],lt.size(catalogo["Artista"])-1))
