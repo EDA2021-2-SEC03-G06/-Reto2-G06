@@ -73,7 +73,7 @@ def addNacionality(catalogo,Artwork):
     artistas = artistas.replace(']','').replace(' ','').replace('[','').split(',')
     for id in artistas:
         artista = mp.get(catalogo["Artista"],id)
-        nacionalidad = artista["value"]["Nationality"]
+        nacionalidad = ma.getValue(artista)["Nationality"]
 
         if mp.contains(catalogo["Nacionalidad"],nacionalidad)==False:
             obras = lt.newList()
