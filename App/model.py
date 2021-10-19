@@ -26,6 +26,7 @@
 
 
 from os import replace
+from DISClib.ADT.stack import top
 from DISClib.DataStructures.arraylist import addLast, getElement, size
 import config as cf
 from DISClib.ADT import list as lt
@@ -35,6 +36,7 @@ from DISClib.Algorithms.Sorting import mergesort as ms
 from DISClib.Algorithms.Sorting import quicksort as qs
 from DISClib.Algorithms.Sorting import shellsort as ss
 from DISClib.DataStructures import mapentry as ma
+from DISClib.DataStructures import orderedmapstructure as om
 from datetime import timedelta as td
 import datetime as dt
 import time as chronos
@@ -53,6 +55,7 @@ def NewCatalog():
                 "Obra": None,
                 "medio": mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Nacionalidad" : None,
+                "Nacimiento" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Adquisicion" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Obras Artista" : mp.newMap(maptype='CHAINING',loadfactor=8.00) }
     catalogo["Artista"] = mp.newMap()  
@@ -84,7 +87,7 @@ def addNacionality(catalogo,Artwork):
             tupla = mp.get(catalogo["Nacionalidad"],nacionalidad)
             lista = tupla["value"]
             lt.addLast(lista,Artwork)
-            mp.put(catalogo["Nacionalidad"],Artwork["Medium"],lista)
+            mp.put(catalogo["Nacionalidad"],nacionalidad,lista)
 
 
 def addMedio(catalogo,Artwork):
@@ -101,6 +104,21 @@ def addMedio(catalogo,Artwork):
         lista = tupla["value"]
         lt.addLast(lista,Artwork)
         mp.put(catalogo["medio"],Artwork["Medium"],lista)
+
+def addNacimiento(catalogo,Artist):
+    """
+    Creación mapa de artistas por su fecha de nacimiento
+    """
+    nacimiento = Artist["BeginDate"]
+    if mp.contains(catalogo["Adquisicion"],nacimiento)==False:
+        artistas = lt.newList()
+        lt.addLast(artistas,Artist)
+        mp.put(catalogo["medio"],nacimiento,artistas)
+    else:
+        tupla = mp.get(catalogo["Artista"],Artist["BeginDate"])
+        artistas = ma.getValue(tupla)
+        lt.addLast(artistas,Artist)
+        mp.put(catalogo["Nacimiento"],nacimiento,artistas)
     
 def addDataAcquired(catalogo,Artwork):
     """
@@ -207,100 +225,80 @@ def ArtworkvArtist(nombre_artista,catalogo):
 
 
 def ArtworkvNacionality(catalogo):
-    
-    cat_obras = catalogo["Obra"]
-    cat_artistas = catalogo["Artista"]
-    size = lt.size(cat_obras)
-    obras_nacionalidad = {}
-    pos = 1
+    nacionalidades = catalogo["Nacionalidad"]
+    tamaño = mp.size(nacionalidades)
+    llaves = mp.keySet(nacionalidades)
+    valores = mp.valueSet(nacionalidades)
+    mapa = mp.newMap()
 
-    
-    while pos<=size:
-        obra = lt.getElement(cat_obras,pos)
-        ids=obra['ConstituentID']
-        ids=ids.replace(']','').replace('[','').split(',')
-        for id in ids:
-            nacionalidad = nationality_artist(cat_artistas,id)
-            if nacionalidad not in obras_nacionalidad:
-                obras_nacionalidad[nacionalidad] = lt.newList()
-            lt.addLast(obras_nacionalidad[nacionalidad],obra)
-        pos+=1
 
-    
-    
-    orden=lt.newList("ARRAY_LIST")
-    repe=lt.newList("ARRAY_LIST")
-    dic_top={}
-    mayor=1000000
-    n=1
-    llave=""
-    
-    while n<=10:
-        anterior = mayor
-        aux=0
-        pais = ""
-        for i in obras_nacionalidad:
-            valor =lt.size(obras_nacionalidad[i])
-            if aux <= valor and (i not in repe['elements']):
-                mayor = valor
-                aux = valor
-                llave = "top " + str(n)
-                lt.addLast(orden,valor)
-                pais = i
-                dic_top[llave]=pais + " : " + str(valor)
-        if n == 1:
-            top_1 = pais
-        lt.addLast(repe,pais)
+    n=0
+    while n<=tamaño:
+        nacionalidad = lt.getElement(llaves,n)
+        obras = lt.getElement(valores,n)
+        lt.addLast(obras,nacionalidades)
+        mp.put(mapa,(lt.size(obras)-1),obras)
         n+=1
 
-    n=5
-    while n>=1:
-        top = dic_top["top " + str(n)]
-        lt.addLast(orden,top)
-        n-=1
-
-    centinela = True
-    while centinela:
-        for i in obras_nacionalidad:
-            if i == top_1:
-                obras_top = obras_nacionalidad[i]
-                centinela = False
-    
-
+    top_10,top_3 = tops(mapa)
+    menores_3 = menores(mapa)
 
     
-    return orden, obras_top
+    return top_10,top_3,menores_3
 
-def obras_nacionalidad(catalogo,nacionalidad):
-    obras = mp.get(catalogo["Nacionalidad"],nacionalidad)["value"]
-    return lt.size(obras)
+
+def tops(mapa):
+    top_10 = mp.newMap()
+    top_3 = mp.newMap()
+    
+    n=0
+    while n<10:
+        mayor = om.maxKey(mapa)
+        aux = mp.get(mapa,mayor)["Value"]
+        mp.put(top_10,mayor,aux)
+
+        if n<=3:
+            mp.put(top_3,mayor,aux)
+        mp.remove(mapa,mayor)
+        n+=1
+
+    return top_10,top_3
+
+
+def menores(mapa):
+    menores_3 = mp.newMap()
+
+    n=0
+    while n<3:
+        mayor = om.minKey(mapa)
+        aux = mp.get(mapa,mayor)["Value"]
+        mp.put(menores_3,mayor,aux)
+        n+=1
+
+    return menores_3
+
+
 # Funciones de consulta
-def dateartist(año_inicio,año_final,catalogo):
-    aux = catalogo["Artista"]
-    artistas_rango = lt.newList()
-    size = lt.size(aux)
-    cantidad = 0
-    n = 0
-
-    while n < size:
-        artista = lt.getElement(aux,n)
-        nacimiento = int(artista["BeginDate"])
-        if año_inicio<=nacimiento<=año_final:
-            lt.addLast(artistas_rango,artista)
-            cantidad+=1
-        n+=1
+def dateartist(año_inicio,año_final,catalogo):  
+    artistas = lt.newList(datastructure="ARRAY_LIST")
+    año = año_inicio
+    num_artistas = 0
+    while año <= año_final:
+        nacimientos = mp.get(catalogo["Nacimiento"],año)
+        if nacimientos != None:
+            nacimientos = ma.getValue(nacimientos)
+            for artista in lt.iterator(nacimientos):
+                lt.addLast(artistas,artista)
+            num_artistas += lt.size(nacimientos)
+        año += 1
     
-    artistas_sorted = merge_sort(artistas_rango,cantidad,compareBeginDate)
-    artistas_sorted = artistas_sorted[1]
-    primeros_3 = lt.newList()
-    lt.addLast(primeros_3,lt.getElement(artistas_sorted,lt.size(artistas_sorted)))
-    lt.addLast(primeros_3,lt.getElement(artistas_sorted,lt.size(artistas_sorted)-1))
-    lt.addLast(primeros_3,lt.getElement(artistas_sorted,lt.size(artistas_sorted)-2))
-    ultimos_3 = lt.newList()
-    lt.addLast(ultimos_3,lt.getElement(artistas_sorted,2))
-    lt.addLast(ultimos_3,lt.getElement(artistas_sorted,1))
-    lt.addLast(ultimos_3,lt.getElement(artistas_sorted,0))
-    return(cantidad,primeros_3,ultimos_3)
+    primeras_3 = lt.newList(datastructure="ARRAY_LIST")
+    for posicion in range(1,4):
+        lt.addLast(primeras_3,lt.getElement(artistas,posicion))
+    ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
+    for posicion in range(lt.size(artistas)-3,lt.size(artistas)):
+        lt.addLast(ultimas_3,lt.getElement(artistas,posicion))
+    return (num_artistas,primeras_3,ultimas_3)
 
 
 
@@ -327,20 +325,6 @@ def dateArtwork(fecha_inicio,fecha_fin,catalogo):
     for posicion in range(lt.size(obras)-3,lt.size(obras)):
         lt.addLast(ultimas_3,lt.getElement(obras,posicion))
     return (num_obras, purchase, primeras_3,ultimas_3)
-
-
-def nationality_artist(catalogo,id):
-    nacionalidad = ""
-    aux = ""
-    n=0
-    while (lt.size(catalogo)>n) and (aux!=id):
-        artista = lt.getElement(catalogo,n)
-        aux = artista["ConstituentID"]
-        if aux == id:
-            nacionalidad = artista["Nationality"]
-        n+=1
-
-    return nacionalidad
 
 
 def departmentArtworks(catalogo,departamento):
@@ -488,7 +472,7 @@ def encontrar_artista(catalogo,constituent_ID):
 
 
 def antiguedad_tecntica(catalogo,tecnica,top):
-    obras = mp.get(catalogo["mapa"],tecnica)
+    obras = mp.get(catalogo["medio"],tecnica)
     obras = obras["value"]
     
     obras_sorted = merge_sort(obras,lt.size(obras),compareData)
