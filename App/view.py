@@ -58,75 +58,13 @@ def ejecutar_dateartist(catalogo):
     año_inicio = int(input("Ingrese el año en el que desea iniciar: "))
     año_final = int(input("Ingrese el año en el que desea terminar: "))
     cantidad,primeros_3,ultimos_3 = controller.initdateartist(año_inicio,año_final,catalogo)
-    print("En ese rango de años nacieron un total de: ",cantidad," artistas.")
-    print("Los primeros 3 en nacer fueron:")
-    n = 1
-    while n <= lt.size(primeros_3):
-        artista = lt.getElement(primeros_3,n)
-        print("*"*50)
-        print("Nombre : ", artista["DisplayName"])
-        print("Fecha de Nacimiento : ", artista["BeginDate"])
-        death = artista["EndDate"]
-        if artista["EndDate"]== "0":
-            death = "Desconocida"
-        print("Fecha de Fallecimiento : ",death)
-        print("Nacionalidad : ", artista["Nationality"])
-        print("Género : ", artista["Gender"])
-        n += 1
-    n = 1
-    print("Los últimos 3 en nacer fueron:")
-    while n <= lt.size(ultimos_3):
-        artista = lt.getElement(ultimos_3,n)
-        print("*"*50)
-        print("Nombre : ", artista["DisplayName"])
-        print("Fecha de nacimiento : ", artista["BeginDate"])
-        death = "Fecha de Fallecimiento : ", artista["EndDate"]
-        if artista["EndDate"]== "0":
-            death = "Fecha de Fallecimiento : Desconocida"
-        print(death)
-        print("Nacionalidad : ", artista["Nationality"])
-        print("Género : ", artista["Gender"])
-        n += 1
+    print(cantidad,primeros_3,ultimos_3)
 
 
 def ejecutar_nacionalidad(catalogo):
-    orden,obras_top = controller.initArtwokvNationality(catalogo)
+    controller.initArtwokvNationality(catalogo)
     print("El top 10 de las nacionalidad con más obras de arte, son:")
-    print(lt.getElement(orden,lt.size(orden)))
-    print(lt.getElement(orden,lt.size(orden)-1))
-    print(lt.getElement(orden,lt.size(orden)-2))
-    print(lt.getElement(orden,lt.size(orden)-3))
-    print(lt.getElement(orden,lt.size(orden)-4))
-    print(lt.getElement(orden,lt.size(orden)-5))
-    print(lt.getElement(orden,lt.size(orden)-6))
-    print(lt.getElement(orden,lt.size(orden)-7))
-    print(lt.getElement(orden,lt.size(orden)-8))
-    print(lt.getElement(orden,lt.size(orden)-9))
-    print("*"*50)
 
-    n = 1
-    print("Las obras pertenecientes al top 1 son: ")
-    while n <= lt.size(obras_top):
-        obra = lt.getElement(obras_top,n)
-        print("*"*50)
-        print("Titulo : ", obra["Title"])
-
-        ids=obra["ConstituentID"]
-        ids=ids.replace(']','').replace('[','').split(',')
-        for id in ids:
-            aux = ""
-            n2=0
-            while (lt.size(catalogo["Artista"])>n2) and (aux!=id):
-                artista = lt.getElement(catalogo,n2)
-                aux = artista["ConstituentID"]
-                if aux == id:
-                    print("Artista : ", artista["DisplayName"])
-                n2+=1
-
-        print("Fecha de la obra : ", obra["Date"])
-        print("Medio : ", obra["Medium"])
-        print("Dimensiones : ", obra["Dimensions"])
-        n += 1
 
 
 def ejecutar_departmentartworks(catalogo):
