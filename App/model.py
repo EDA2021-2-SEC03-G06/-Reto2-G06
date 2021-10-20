@@ -235,8 +235,6 @@ def artista_prolifico(num_artista,año_inicial,año_fina,catalogo):
     genero = ""
     id = ""
     for artista in lt.iterator(artistas):
-        print(artista)
-        print(mp.get(catalogo["Obra"],artista))
         if mp.get(catalogo["Obra"],artista) != None:
             obras = ma.getValue(mp.get(catalogo["Obra"],artista))
             if  lt.size(obras) > mayor:
