@@ -49,6 +49,7 @@ def loadArtwork(catalogo):
         model.addArtwork(catalogo,Artwork)
         model.addNacionality(catalogo,Artwork)
         model.addMedio(catalogo,Artwork)
+        model.addDepartamento(catalogo,Artwork)
         model.addDataAcquired(catalogo,Artwork)
         model.addArtworkxArtist(catalogo,Artwork)
     stop_time = chronos.process_time()

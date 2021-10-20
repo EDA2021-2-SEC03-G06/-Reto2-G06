@@ -57,6 +57,7 @@ def NewCatalog():
                 "Nacionalidad" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Nacimiento" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Adquisicion" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
+                "Departamento" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Obras Artista" : mp.newMap(maptype='CHAINING',loadfactor=8.00) }
     catalogo["Artista"] = mp.newMap()  
     catalogo["Obra"] = mp.newMap()
@@ -118,6 +119,21 @@ def addNacimiento(catalogo,Artist):
         artistas = ma.getValue(tupla)
         lt.addLast(artistas,Artist)
         mp.put(catalogo["Nacimiento"],nacimiento,artistas)
+
+def addDepartamento(catalogo,Artwork):
+    """
+    Creación mapa de obras por su departamento
+    """
+    if mp.contains(catalogo["Departamento"],Artwork["Department"])==False:
+        obras = lt.newList()
+        lt.addLast(obras,Artwork)
+        mp.put(catalogo["Departamento"],Artwork["Department"],obras)
+    
+    else:
+        tupla = mp.get(catalogo["Departamento"],Artwork["Department"])
+        lista = tupla["value"]
+        lt.addLast(lista,Artwork)
+        mp.put(catalogo["Departamento"],Artwork["Department"],lista)
     
 def addDataAcquired(catalogo,Artwork):
     """
@@ -335,19 +351,10 @@ def dateArtwork(fecha_inicio,fecha_fin,catalogo):
 
 
 def departmentArtworks(catalogo,departamento):
-    aux = catalogo["Obra"]
-    obras_depart = lt.newList()
-    size = lt.size(aux)
-    cantidad = 0
-    n = 0
-
-    while n <= size:
-        obra = lt.getElement(aux,n)
-        cmp_depart = obra["Department"]
-        if departamento==cmp_depart:
-            lt.addLast(obras_depart,obra)
-            cantidad+=1
-        n+=1
+    tupla = mp.get(catalogo["Departamento"],departamento)
+    obras = tupla["value"]
+    size = lt.size(obras)
+    
     
     print("se han terminado de contabilizar las obras pertenecientes al departamento: "+departamento)
     print("se comenzará a calcular costos y pesos, por favor espere")
@@ -355,9 +362,8 @@ def departmentArtworks(catalogo,departamento):
     n = 0
     peso_total = 0
     costo_total = 0
-    size = lt.size(obras_depart)
     while  n <= size:
-        obra = lt.getElement(obras_depart,n)
+        obra = lt.getElement(obras,n)
         dimensiones = lt.newList()
         costo_medida = 1
         costo_peso = 0
@@ -395,7 +401,7 @@ def departmentArtworks(catalogo,departamento):
             if obra["Height (cm)"]!="":
                 area_volumen = area_volumen*(float(obra["Height (cm)"])/100)
             costo_circular = area_volumen*72
-        lt.addLast(costos,costo_circular)
+            lt.addLast(costos,costo_circular)
                 
         
 
@@ -409,11 +415,10 @@ def departmentArtworks(catalogo,departamento):
 
         
         n+=1
-    for i in range(lt.size(obras_depart)+1):
-        obra=lt.getElement(obras_depart,i)
-        print(obra["costo"])
+    for i in range(lt.size(obras)+1):
+        obra=lt.getElement(obras,i)
 
-    obras_sorted = merge_sort(obras_depart,cantidad,compareData)
+    obras_sorted = merge_sort(obras,size,compareData)
     obras_sorted = obras_sorted[1]
     antiguas_5 = lt.newList()
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)))
@@ -422,7 +427,7 @@ def departmentArtworks(catalogo,departamento):
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)-3))
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)-4))
     
-    obras_sorted = merge_sort(obras_depart,cantidad,comparePrice)
+    obras_sorted = merge_sort(obras,size,compareData)
     obras_sorted = obras_sorted[1]
     costosas_5 = lt.newList()
     lt.addLast(costosas_5,lt.getElement(obras_sorted,4))
@@ -433,7 +438,7 @@ def departmentArtworks(catalogo,departamento):
     
     
 
-    return cantidad,costo_total,peso_total,antiguas_5,costosas_5
+    return size,costo_total,peso_total,antiguas_5,costosas_5
 
 def nueva_expo(catalogo,año_inicio,año_fin,area):
     obras_expo = lt.newList()

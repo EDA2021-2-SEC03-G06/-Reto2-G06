@@ -24,6 +24,7 @@ import config as cf
 import sys
 import controller
 from DISClib.ADT import list as lt
+from DISClib.ADT import map as mp
 assert cf
 
 default_limit = 1000
@@ -70,8 +71,9 @@ def ejecutar_nacionalidad(catalogo):
 def ejecutar_departmentartworks(catalogo):
     departamento = input("Ingrese el departamento a transportar: ")
     cantidad,costo_total,peso_total,antiguas_5,costosas_5 = controller.initdepartmentArtworks(catalogo,departamento)
-    print("la cantidad de obras del departamento "+departamento+"que se han de transportar son "+cantidad)
-    print("Valor promedio (USD): "+costo_total)
+    print("la cantidad de obras del departamento "+departamento+" que se han de transportar son "+ str(cantidad))
+    print("Valor promedio (USD): "+str(costo_total))
+    print("Peso total de las obras (Kg): "+str(peso_total))
     print("Las 5 obras más antiguas son: ")
     n=1
     while n <= lt.size(antiguas_5):
@@ -79,16 +81,13 @@ def ejecutar_departmentartworks(catalogo):
         print("*"*50)
         print("Titulo : ", obra["Title"])
         ids=obra["ConstituentID"]
-        ids=ids.replace(']','').replace('[','').split(',')
+        ids=ids.replace(']','').replace('[','').replace(' ','').split(',')
         for id in ids:
-            aux = ""
-            n2=0
-            while (lt.size(catalogo["Artista"])>n2) and (aux!=id):
-                artista = lt.getElement(catalogo,n2)
-                aux = artista["ConstituentID"]
-                if aux == id:
-                    print("Artista : ", artista["DisplayName"])
-                n2+=1
+            tupla = mp.get(catalogo["Artista"],id)
+            print(id)
+            artista = tupla["value"]
+            print("Artista : ", artista["DisplayName"])
+        
         print("Fecha de la obra : ", obra["Date"])
         print("Medio : ", obra["Medium"])
         print("Dimensiones : ", obra["Dimensions"])
@@ -96,21 +95,18 @@ def ejecutar_departmentartworks(catalogo):
         n += 1
     print("Las 5 obras más costosas son: ")
     n=1
-    while n <= lt.size(antiguas_5):
-        obra = lt.getElement(antiguas_5,n)
+    while n <= lt.size(costosas_5):
+        obra = lt.getElement(costosas_5,n)
         print("*"*50)
         print("Titulo : ", obra["Title"])
         ids=obra["ConstituentID"]
-        ids=ids.replace(']','').replace('[','').split(',')
+        ids=ids.replace(']','').replace('[','').replace(' ','').split(',')
         for id in ids:
-            aux = ""
-            n2=0
-            while (lt.size(catalogo["Artista"])>n2) and (aux!=id):
-                artista = lt.getElement(catalogo,n2)
-                aux = artista["ConstituentID"]
-                if aux == id:
-                    print("Artista : ", artista["DisplayName"])
-                n2+=1
+            tupla = mp.get(catalogo["Artista"],id)
+            print(id)
+            artista = tupla["value"]
+            print("Artista : ", artista["DisplayName"])
+        
         print("Fecha de la obra : ", obra["Date"])
         print("Medio : ", obra["Medium"])
         print("Dimensiones : ", obra["Dimensions"])
@@ -231,6 +227,7 @@ while True:
         print("Se cargaron " + str(lt.size(catalogo["Artista"]))+" artistas")
         print("Se cargaron " + str(lt.size(catalogo["Obra"]))+" obras")
         """
+        
     elif int(inputs) == 2:
         print(ejecutar_dateartist(catalogo))
     elif int(inputs) == 3:
