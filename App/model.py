@@ -333,7 +333,6 @@ def dateartist(año_inicio,año_final,catalogo):
     num_artistas = 0
     while año <= año_final:
         nacimientos = mp.get(catalogo["Nacimiento"],str(año))
-        print(nacimientos)
         if nacimientos != None:
             nacimientos = ma.getValue(nacimientos)
             for artista in lt.iterator(nacimientos):

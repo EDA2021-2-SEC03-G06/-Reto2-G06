@@ -59,7 +59,35 @@ def ejecutar_dateartist(catalogo):
     año_inicio = int(input("Ingrese el año en el que desea iniciar: "))
     año_final = int(input("Ingrese el año en el que desea terminar: "))
     cantidad,primeros_3,ultimos_3 = controller.initdateartist(año_inicio,año_final,catalogo)
-    print(cantidad,primeros_3,ultimos_3)
+    print("En ese rango de años nacieron un total de: ",cantidad," artistas.")
+    print("Los primeros 3 en nacer fueron:")
+    n = 1
+    while n <= lt.size(primeros_3):
+        artista = lt.getElement(primeros_3,n)
+        print("*"*50)
+        print("Nombre : ", artista["DisplayName"])
+        print("Fecha de Nacimiento : ", artista["BeginDate"])
+        death = artista["EndDate"]
+        if artista["EndDate"]== "0":
+            death = "Desconocida"
+        print("Fecha de Fallecimiento : ",death)
+        print("Nacionalidad : ", artista["Nationality"])
+        print("Género : ", artista["Gender"])
+        n += 1
+    n = 1
+    print("Los últimos 3 en nacer fueron:")
+    while n <= lt.size(ultimos_3):
+        artista = lt.getElement(ultimos_3,n)
+        print("*"*50)
+        print("Nombre : ", artista["DisplayName"])
+        print("Fecha de nacimiento : ", artista["BeginDate"])
+        death = "Fecha de Fallecimiento : ", artista["EndDate"]
+        if artista["EndDate"]== "0":
+            death = "Fecha de Fallecimiento : Desconocida"
+        print(death)
+        print("Nacionalidad : ", artista["Nationality"])
+        print("Género : ", artista["Gender"])
+        n += 1
 
 
 def ejecutar_nacionalidad(catalogo):
