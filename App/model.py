@@ -200,12 +200,10 @@ def ArtworkvArtist(nombre_artista,catalogo):
 
 def artista_prolifico(num_artista,año_inicial,año_fina,catalogo):
     fecha = año_inicial
+    artistas = lt.newList(datastructure="ARRAY_LIST")
     nartistas = 0
     while fecha <= año_fina and nartistas < num_artista:
-        print("hello")
-        
-    """
-        adquisiciones = mp.get(catalogo["Adquisicion"],fecha)
+        adquisiciones = mp.get(catalogo["Nacimiento"],fecha)
         if adquisiciones != None:
             adquisiciones = ma.getValue(adquisiciones)
             for artista in lt.iterator(adquisiciones):
@@ -216,10 +214,9 @@ def artista_prolifico(num_artista,año_inicial,año_fina,catalogo):
     nombre = ""
     for artista in lt.iterator(artistas):
         obras = ma.getValue(mp.get(catalogo["Obra"],artista))
-        if lt.size(obras) > mayor:
+        if  lt.size(obras) > mayor:
             mayor = lt.size(obras)
             nombre = artista
-    """
 
 def ArtworkvNacionality(catalogo):
     nacionalidades = catalogo["Nacionalidad"]
