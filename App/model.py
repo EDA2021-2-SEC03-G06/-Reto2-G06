@@ -28,6 +28,7 @@
 from os import replace
 from DISClib.ADT.stack import top
 from DISClib.DataStructures.arraylist import addLast, getElement, size
+from DISClib.DataStructures.chaininghashtable import get
 import config as cf
 from DISClib.ADT import list as lt
 from DISClib.ADT import map as mp
@@ -57,25 +58,25 @@ def NewCatalog():
                 "Nacionalidad" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Nacimiento" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Adquisicion" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
-                "Departamento" : mp.newMap(maptype='CHAINING',loadfactor=8.00),
                 "Obras Artista" : mp.newMap(maptype='CHAINING',loadfactor=8.00) }
     catalogo["Artista"] = mp.newMap()  
     catalogo["Obra"] = mp.newMap()
+    catalogo["Departamento"] = mp.newMap()
     return catalogo
 # Funciones para agregar informacion al catalogo
 def addArtist(catalogo,Artist):
-    mp.put(catalogo["Artista"],Artist["ConstituentID"],Artist)
+    mp.put(catalogo["Artista"],Artist["ConstituentID"].replace(']','').replace(' ','').replace('[',''),Artist)
 def addArtwork(catalogo,Artwork):
-    if mp.contains(catalogo["Obra"],Artwork["ConstituentID"])==False:
-        obras = lt.newList()
-        lt.addLast(obras,Artwork)
-        mp.put(catalogo["Obra"],Artwork["ConstituentID"],obras)
-    
-    else:
-        tupla = mp.get(catalogo["Obra"],Artwork["ConstituentID"])
-        lista = ma.getValue(tupla)
+    artistas = Artwork["ConstituentID"]
+    artistas = artistas.replace(']','').replace(' ','').replace('[','').split(',')
+    for id in artistas:
+        if mp.contains(catalogo["Obra"],id)==False:
+            lista = lt.newList(datastructure="ARRAY_LIST")
+        else:
+            tupla = mp.get(catalogo["Obra"],id)
+            lista = ma.getValue(tupla)
         lt.addLast(lista,Artwork)
-        mp.put(catalogo["Obra"],Artwork["ConstituentID"],lista)
+        mp.put(catalogo["Obra"],id,lista)
 
 def addNacionality(catalogo,Artwork):
     """
@@ -128,21 +129,6 @@ def addNacimiento(catalogo,Artist):
         artistas = ma.getValue(tupla)
         lt.addLast(artistas,Artist)
         mp.put(catalogo["Nacimiento"],nacimiento,artistas)
-
-def addDepartamento(catalogo,Artwork):
-    """
-    Creación mapa de obras por su departamento
-    """
-    if mp.contains(catalogo["Departamento"],Artwork["Department"])==False:
-        obras = lt.newList()
-        lt.addLast(obras,Artwork)
-        mp.put(catalogo["Departamento"],Artwork["Department"],obras)
-    
-    else:
-        tupla = mp.get(catalogo["Departamento"],Artwork["Department"])
-        lista = tupla["value"]
-        lt.addLast(lista,Artwork)
-        mp.put(catalogo["Departamento"],Artwork["Department"],lista)
     
 def addDataAcquired(catalogo,Artwork):
     """
@@ -176,6 +162,22 @@ def addArtworkxArtist(catalogo,Artwork):
             obras = ma.getValue(tupla)
             lt.addLast(obras,Artwork)
         mp.put(catalogo["Obras Artista"],nombre,obras)
+
+def addDepartamento(catalogo,Artwork):
+    """
+    Creación mapa de obras por su departamento
+    """
+    if mp.contains(catalogo["Departamento"],Artwork["Department"])==False:
+        obras = lt.newList()
+        lt.addLast(obras,Artwork)
+        mp.put(catalogo["Departamento"],Artwork["Department"],obras)
+
+    else:
+        tupla = mp.get(catalogo["Departamento"],Artwork["Department"])
+        lista = tupla["value"]
+        lt.addLast(lista,Artwork)
+        mp.put(catalogo["Departamento"],Artwork["Department"],lista)
+
 # Funciones para creacion de datos
 def ArtworkvArtist(nombre_artista,catalogo):
     medios = mp.newMap()
@@ -219,20 +221,49 @@ def artista_prolifico(num_artista,año_inicial,año_fina,catalogo):
     artistas = lt.newList(datastructure="ARRAY_LIST")
     nartistas = 0
     while fecha <= año_fina and nartistas < num_artista:
-        adquisiciones = mp.get(catalogo["Nacimiento"],fecha)
+        adquisiciones = mp.get(catalogo["Nacimiento"],str(fecha))
         if adquisiciones != None:
             adquisiciones = ma.getValue(adquisiciones)
             for artista in lt.iterator(adquisiciones):
                 lt.addLast(artistas,artista["ConstituentID"])
                 nartistas += 1
-        fecha += dt.timedelta(1,0,0)
+        fecha += 1
+    
     mayor = 0
     nombre = ""
+    fecha_nacimiento = 0
+    genero = ""
+    id = ""
     for artista in lt.iterator(artistas):
-        obras = ma.getValue(mp.get(catalogo["Obra"],artista))
-        if  lt.size(obras) > mayor:
-            mayor = lt.size(obras)
-            nombre = artista
+        print(artista)
+        print(mp.get(catalogo["Obra"],artista))
+        if mp.get(catalogo["Obra"],artista) != None:
+            obras = ma.getValue(mp.get(catalogo["Obra"],artista))
+            if  lt.size(obras) > mayor:
+                id = artista
+                mayor = lt.size(obras)
+                nombre = ma.getValue(mp.get(catalogo["Artista"],artista))["DisplayName"]
+                fecha_nacimiento = ma.getValue(mp.get(catalogo["Artista"],artista))["BeginDate"]
+                genero = ma.getValue(mp.get(catalogo["Artista"],artista))["Gender"]
+    medios = mp.newMap()
+    for obra in lt.iterator(ma.getValue(mp.get(catalogo["Obra"],id))):
+        if mp.contains(medios,obra["Medium"])==False:
+            obras_medio = lt.newList(datastructure="ARRAY_LIST")
+        else:
+            tupla = mp.get(obras,obra["Medium"])
+            obras_medio = ma.getValue(tupla)
+        lt.addLast(obras_medio,obra)
+        mp.put(medios,obra["Medium"],obras_medio)
+    mayor_medio = 0
+    nombre_medio = ""
+    for medio in lt.iterator(mp.keySet(medios)):
+        if mp.get(medios,medio) != None:
+            obras = ma.getValue(mp.get(medios,medio))
+            if  lt.size(obras) > mayor_medio:
+                mayor_medio = lt.size(obras)
+                nombre_medio = medio
+    tamaño = mp.size(medios)
+    return (nombre,fecha_nacimiento,genero,mayor,tamaño,nombre_medio,ma.getValue((mp.get(medios,nombre_medio))))
 
 def ArtworkvNacionality(catalogo):
     nacionalidades = catalogo["Nacionalidad"]
@@ -346,10 +377,19 @@ def dateArtwork(fecha_inicio,fecha_fin,catalogo):
 
 
 def departmentArtworks(catalogo,departamento):
-    tupla = mp.get(catalogo["Departamento"],departamento)
-    obras = tupla["value"]
-    size = lt.size(obras)
-    
+    aux = catalogo["Obra"]
+    obras_depart = lt.newList()
+    size = lt.size(aux)
+    cantidad = 0
+    n = 0
+
+    while n <= size:
+        obra = lt.getElement(aux,n)
+        cmp_depart = obra["Department"]
+        if departamento==cmp_depart:
+            lt.addLast(obras_depart,obra)
+            cantidad+=1
+        n+=1
     
     print("se han terminado de contabilizar las obras pertenecientes al departamento: "+departamento)
     print("se comenzará a calcular costos y pesos, por favor espere")
@@ -357,8 +397,9 @@ def departmentArtworks(catalogo,departamento):
     n = 0
     peso_total = 0
     costo_total = 0
+    size = lt.size(obras_depart)
     while  n <= size:
-        obra = lt.getElement(obras,n)
+        obra = lt.getElement(obras_depart,n)
         dimensiones = lt.newList()
         costo_medida = 1
         costo_peso = 0
@@ -396,7 +437,7 @@ def departmentArtworks(catalogo,departamento):
             if obra["Height (cm)"]!="":
                 area_volumen = area_volumen*(float(obra["Height (cm)"])/100)
             costo_circular = area_volumen*72
-            lt.addLast(costos,costo_circular)
+        lt.addLast(costos,costo_circular)
                 
         
 
@@ -410,10 +451,11 @@ def departmentArtworks(catalogo,departamento):
 
         
         n+=1
-    for i in range(lt.size(obras)+1):
-        obra=lt.getElement(obras,i)
+    for i in range(lt.size(obras_depart)+1):
+        obra=lt.getElement(obras_depart,i)
+        print(obra["costo"])
 
-    obras_sorted = merge_sort(obras,size,compareData)
+    obras_sorted = merge_sort(obras_depart,cantidad,compareData)
     obras_sorted = obras_sorted[1]
     antiguas_5 = lt.newList()
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)))
@@ -422,7 +464,7 @@ def departmentArtworks(catalogo,departamento):
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)-3))
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)-4))
     
-    obras_sorted = merge_sort(obras,size,compareData)
+    obras_sorted = merge_sort(obras_depart,cantidad,comparePrice)
     obras_sorted = obras_sorted[1]
     costosas_5 = lt.newList()
     lt.addLast(costosas_5,lt.getElement(obras_sorted,4))
@@ -433,7 +475,7 @@ def departmentArtworks(catalogo,departamento):
     
     
 
-    return size,costo_total,peso_total,antiguas_5,costosas_5
+    return cantidad,costo_total,peso_total,antiguas_5,costosas_5
 
 def nueva_expo(catalogo,año_inicio,año_fin,area):
     obras_expo = lt.newList()
