@@ -65,7 +65,16 @@ def NewCatalog():
 def addArtist(catalogo,Artist):
     mp.put(catalogo["Artista"],Artist["ConstituentID"],Artist)
 def addArtwork(catalogo,Artwork):
-    mp.put(catalogo["Obra"],Artwork["ObjectID"],Artwork)
+    if mp.contains(catalogo["Obra"],Artwork["ConstituentID"])==False:
+        obras = lt.newList()
+        lt.addLast(obras,Artwork)
+        mp.put(catalogo["Obra"],Artwork["ConstituentID"],obras)
+    
+    else:
+        tupla = mp.get(catalogo["Obra"],Artwork["ConstituentID"])
+        lista = ma.getValue(tupla)
+        lt.addLast(lista,Artwork)
+        mp.put(catalogo["Obra"],Artwork["ConstituentID"],lista)
 
 def addNacionality(catalogo,Artwork):
     """
@@ -154,7 +163,7 @@ def addArtworkxArtist(catalogo,Artwork):
 # Funciones para creacion de datos
 def ArtworkvArtist(nombre_artista,catalogo):
     medios = mp.newMap()
-    if mp.contains(catalogo["Obras Artista"],nombre_artista):
+    if mp.contains(catalogo["Obras Artista"],nombre_artista)==True:
         obras = ma.getValue(mp.get(catalogo["Obras Artista"],nombre_artista))
         obras_totales = lt.size(obras)
         for obra in lt.iterator(obras):
@@ -187,41 +196,30 @@ def ArtworkvArtist(nombre_artista,catalogo):
     else:
         primeras_3 = lt.newList(datastructure="ARRAY_LIST")
         ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
-        return(0,0,"No uso medios")
-    """
-    obras_artista = {}
-    total_obras = 0
-    total_medios = 0
-    posicion = 0
-    while posicion < lt.size(catalogo["Artista"]) and nombre_artista != lt.getElement(catalogo["Artista"],posicion)["DisplayName"]:
-        posicion += 1
-    constituenID_artista = lt.getElement(catalogo["Artista"],posicion)["ConstituentID"]
-    print(constituenID_artista)
-    constituenID_artista = "[" + constituenID_artista + "]"
-    print(constituenID_artista)
-    posicion = 0
-    while posicion < lt.size(catalogo["Obra"]):
-        obra = lt.getElement(catalogo["Obra"],posicion)
-        print(posicion)
-        if obra["ConstituentID"] == constituenID_artista:
-            if obra["Medium"] in obras_artista:
-                lt.addLast(obras_artista[obra["Medium"]],obra)
-            else:
-                obras_artista[obra["Medium"]] = lt.newList()
-                lt.addLast(obras_artista[obra["Medium"]],obra["Medium"])
-                total_medios += 1
-            total_obras += 1
-        posicion += 1
-    print(obras_artista)
-    medio_n = 0
-    nombre = ""
-    for llave in obras_artista:
-        if lt.size(obras_artista[llave]) > medio_n:
-            medio_n = lt.size(obras_artista[llave])
-            nombre = llave
-    return (total_obras,total_medios,nombre,obras_artista[nombre])
-    """
+        return(0,0,"No uso medios",primeras_3,ultimas_3)
 
+def artista_prolifico(num_artista,año_inicial,año_fina,catalogo):
+    fecha = año_inicial
+    nartistas = 0
+    while fecha <= año_fina and nartistas < num_artista:
+        print("hello")
+        
+    """
+        adquisiciones = mp.get(catalogo["Adquisicion"],fecha)
+        if adquisiciones != None:
+            adquisiciones = ma.getValue(adquisiciones)
+            for artista in lt.iterator(adquisiciones):
+                lt.addLast(artistas,artista["ConstituentID"])
+                nartistas += 1
+        fecha += dt.timedelta(1,0,0)
+    mayor = 0
+    nombre = ""
+    for artista in lt.iterator(artistas):
+        obras = ma.getValue(mp.get(catalogo["Obra"],artista))
+        if lt.size(obras) > mayor:
+            mayor = lt.size(obras)
+            nombre = artista
+    """
 
 def ArtworkvNacionality(catalogo):
     nacionalidades = catalogo["Nacionalidad"]
