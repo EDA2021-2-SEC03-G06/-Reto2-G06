@@ -241,63 +241,64 @@ def ArtworkvArtist(nombre_artista,catalogo):
 
 def ArtworkvNacionality(catalogo):
     nacionalidades = catalogo["Nacionalidad"]
-    tamaño = mp.size(nacionalidades)
     llaves = mp.keySet(nacionalidades)
     valores = mp.valueSet(nacionalidades)
-    mapa = mp.newMap()
+    top_10 = lt.newList()
 
 
     n=0
-    while n<=tamaño:
-        nacionalidad = lt.getElement(llaves,n)
-        obras = lt.getElement(valores,n)
-        lt.addLast(obras,nacionalidad)
-        mp.put(mapa,(lt.size(obras)-1),obras)
+    while n<10:
+        mayor = 0
+        obras_mayor = None
+        nacio_mayor = ""
+        n2 = 0
+        tamaño = lt.size(llaves)
+        while n2<=tamaño:
+            nacio = lt.getElement(llaves,n2)
+            if nacio !="" and nacio!="Nationality unknown":
+                aux = mp.get(nacionalidades,nacio)
+                if aux != None:
+                    obras = aux["value"]
+                    size = lt.size(obras)
+                    if size > mayor:
+                        mayor = size
+                        obras_mayor = obras
+                        nacio_mayor = nacio
+            n2+=1
+        if n == 0:
+            obras_top = obras_mayor
+        lt.addLast(top_10,nacio_mayor)
+        lt.removeFirst(llaves)
+        mp.remove(nacionalidades,nacio_mayor)
         n+=1
 
-    cantidad = mp.keySet(mapa)
-    cantidad_sorted = (merge_sort(cantidad,lt.size(cantidad),compareKey))
-    cantidad_sorted = cantidad_sorted[1]
-    top_10 = tops(cantidad_sorted,mapa)
-    menores_3 = menores(cantidad_sorted,mapa)
-    
-    return top_10,menores_3
+
+    primeras_3 = lt.newList(datastructure="ARRAY_LIST")
+    for posicion in range(4):
+        lt.addLast(primeras_3,lt.getElement(obras_top,posicion))
+    ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
+    for posicion in range(lt.size(obras_top)-3,lt.size(obras_top)):
+        lt.addLast(ultimas_3,lt.getElement(obras_top,posicion))
+
+    return top_10, primeras_3, ultimas_3
 
 
 def tops(cantidad,mapa):
     top_10 = lt.newList()
+    obras_top = None
     
     n=0
     while n<10:
-        dic = {}
         llave = lt.getElement(cantidad,n)
         aux = mp.get(mapa,llave)
         obras = aux["value"]
         nacio = lt.getElement(obras,lt.size(obras))
-        dic[nacio] = obras
-        lt.addLast(top_10,dic)
+        if n == 0:
+            obras_top = obras
+        lt.addLast(top_10,nacio)
         n+=1
 
-    return top_10
-
-
-def menores(cantidad,mapa):
-    menores_3 = lt.newList()
-
-    n=0
-    while n<3:
-        dic = {}
-        pos = lt.size(cantidad)-n
-        llave = lt.getElement(cantidad,pos)
-        print(llave)
-        aux = mp.get(mapa,llave)
-        obras = aux["value"]
-        nacio = lt.getElement(obras,lt.size(obras))
-        dic[nacio] = obras
-        lt.addLast(menores_3,dic)
-        n+=1
-
-    return menores_3
+    return top_10, obras_top
 
 
 # Funciones de consulta

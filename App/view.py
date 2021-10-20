@@ -91,8 +91,48 @@ def ejecutar_dateartist(catalogo):
 
 
 def ejecutar_nacionalidad(catalogo):
-    controller.initArtwokvNationality(catalogo)
+    top_10,primeras_3,ultimas_3 = controller.initArtwokvNationality(catalogo)
     print("El top 10 de las nacionalidad con más obras de arte, son:")
+    for pais in lt.iterator(top_10):
+        print("-"+pais)
+        
+
+    print("Sus 3 primeras obras son:")
+    n=1
+    while n <= lt.size(primeras_3):
+        obra = lt.getElement(primeras_3,n)
+        print("*"*50)
+        print("Titulo : ", obra["Title"])
+        ids=obra["ConstituentID"]
+        ids=ids.replace(']','').replace('[','').replace(' ','').split(',')
+        for id in ids:
+            tupla = mp.get(catalogo["Artista"],id)
+            artista = tupla["value"]
+            print("Artista : ", artista["DisplayName"])
+        
+        print("Fecha de la obra : ", obra["Date"])
+        print("Medio : ", obra["Medium"])
+        print("Dimensiones : ", obra["Dimensions"])
+        n += 1
+    
+    print("Sus 3 últimas obras son:")
+    n=1
+    while n <= lt.size(ultimas_3):
+        obra = lt.getElement(ultimas_3,n)
+        print("*"*50)
+        print("Titulo : ", obra["Title"])
+        ids=obra["ConstituentID"]
+        ids=ids.replace(']','').replace('[','').replace(' ','').split(',')
+        for id in ids:
+            tupla = mp.get(catalogo["Artista"],id)
+            artista = tupla["value"]
+            print("Artista : ", artista["DisplayName"])
+        
+        print("Fecha de la obra : ", obra["Date"])
+        print("Medio : ", obra["Medium"])
+        print("Dimensiones : ", obra["Dimensions"])
+        n += 1
+
 
 
 
@@ -112,7 +152,6 @@ def ejecutar_departmentartworks(catalogo):
         ids=ids.replace(']','').replace('[','').replace(' ','').split(',')
         for id in ids:
             tupla = mp.get(catalogo["Artista"],id)
-            print(id)
             artista = tupla["value"]
             print("Artista : ", artista["DisplayName"])
         
