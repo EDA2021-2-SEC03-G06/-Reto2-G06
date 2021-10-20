@@ -45,7 +45,7 @@ def printMenu():
     print("4- Clasificar las obras de un artista por tecnica")
     print("5- Clasificar obras por nacionalidad de sus creadores")
     print("6- Mover Obra de un departamento")
-    print("7- Proponer una nueva exposición")
+    print("7- Artista mas prolifico de un periodo de tiempo")
     print("8- Organizar una muestra de obras por fecha")
     print("9- Listado cronologico de obras según una técnica")
     print("0- Salir")
@@ -271,6 +271,36 @@ def viewobranacionalidad():
     nacionalidad = input("Ingrese la nacionalidad que le interesa")
     tamaño = controller.initobra_nacionalidad(catalogo,nacionalidad)
     print("De esa nacionalidad hay: ",tamaño)
+def viewartistaprolifico():
+    nartista = int(input("Ingrese el numero de artistas"))
+    begin_Date = int(input("Ingrese el primer año"))
+    Last_Date = int(input("Ingrese el ultimo año"))
+    nombre,nacimiento,genero,total_obras,total_medios,medio,obrasxmedio = controller.initartistaprolifico(begin_Date,Last_Date,nartista,catalogo)
+    print("EL ARTISTA MAS PROLIFICO EN ESA EPOCA FUE: ")
+    print("Nombre: "+nombre)
+    print("Año de nacimiento: " + nacimiento)
+    print("Genero : "+ genero)
+    print("Hizo : ",total_obras," de obras")
+    print("Usando : ",total_medios," Medios")
+    print("El medio mas usado fue : ",medio)
+    if lt.size(obrasxmedio) < 5:
+        for obra in lt.iterator(obrasxmedio):
+            print("*"*50)
+            print("Titulo : ", obra["Title"])
+            print("Fecha : ", obra["Date"])
+            print("Clasificacion: ", obra["Classification"])
+            print("Medio : ", obra["Medium"])
+            print("Dimensiones : ",obra["Dimensions"])
+    else:
+        for posicion in range(1,6):
+            obra = lt.getElement(obrasxmedio,posicion)
+            print("*"*50)
+            print("Titulo : ", obra["Title"])
+            print("Fecha : ", obra["Date"])
+            print("Clasificacion: ", obra["Classification"])
+            print("Medio : ", obra["Medium"])
+            print("Dimensiones : ",obra["Dimensions"])
+
 """
 Menu principal
 """
@@ -306,7 +336,7 @@ while True:
     elif  int(inputs) == 6:
         ejecutar_departmentartworks(catalogo)
     elif int(inputs) == 7:
-        viewnuevaexpo()
+        viewartistaprolifico()
     elif int(inputs) == 8:
         viewsort()
     elif int(inputs) == 9:
