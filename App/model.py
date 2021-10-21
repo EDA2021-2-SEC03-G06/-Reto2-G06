@@ -180,6 +180,7 @@ def addDepartamento(catalogo,Artwork):
 
 # Funciones para creacion de datos
 def ArtworkvArtist(nombre_artista,catalogo):
+    start_time = chronos.process_time()
     medios = mp.newMap()
     if mp.contains(catalogo["Obras Artista"],nombre_artista)==True:
         obras = ma.getValue(mp.get(catalogo["Obras Artista"],nombre_artista))
@@ -210,13 +211,13 @@ def ArtworkvArtist(nombre_artista,catalogo):
         else:
             primeras_3 = ma.getValue(mp.get(medios,mayor))
             ultimas_3 = ma.getValue(mp.get(medios,mayor))
-        return (obras_totales,total_medios,mayor,primeras_3,ultimas_3)
-    else:
-        primeras_3 = lt.newList(datastructure="ARRAY_LIST")
-        ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
-        return(0,0,"No uso medios",primeras_3,ultimas_3)
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    print("se demoro: ", time)
+    return (obras_totales,total_medios,mayor,primeras_3,ultimas_3)
 
 def artista_prolifico(num_artista,año_inicial,año_fina,catalogo):
+    start_time = chronos.process_time()
     fecha = año_inicial
     artistas = lt.newList(datastructure="ARRAY_LIST")
     nartistas = 0
@@ -261,9 +262,13 @@ def artista_prolifico(num_artista,año_inicial,año_fina,catalogo):
                 mayor_medio = lt.size(obras)
                 nombre_medio = medio
     tamaño = mp.size(medios)
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    print("se demoro: ", time)
     return (nombre,fecha_nacimiento,genero,mayor,tamaño,nombre_medio,ma.getValue((mp.get(medios,nombre_medio))))
 
 def ArtworkvNacionality(catalogo):
+    start_time = chronos.process_time()
     nacionalidades = catalogo["Nacionalidad"]
     llaves = mp.keySet(nacionalidades)
     top_10 = lt.newList()
@@ -303,10 +308,14 @@ def ArtworkvNacionality(catalogo):
     for posicion in range(lt.size(obras_top)-3,lt.size(obras_top)):
         lt.addLast(ultimas_3,lt.getElement(obras_top,posicion))
 
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    print("se demoro: ", time)
     return top_10, primeras_3, ultimas_3
 
 
 def tops(cantidad,mapa):
+    start_time = chronos.process_time()
     top_10 = lt.newList()
     obras_top = None
     
@@ -321,11 +330,15 @@ def tops(cantidad,mapa):
         lt.addLast(top_10,nacio)
         n+=1
 
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    print("se demoro: ", time)
     return top_10, obras_top
 
 
 # Funciones de consulta
 def dateartist(año_inicio,año_final,catalogo):  
+    start_time = chronos.process_time()
     artistas = lt.newList(datastructure="ARRAY_LIST")
     año = año_inicio
     num_artistas = 0
@@ -344,11 +357,15 @@ def dateartist(año_inicio,año_final,catalogo):
     ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
     for posicion in range(lt.size(artistas)-3,lt.size(artistas)):
         lt.addLast(ultimas_3,lt.getElement(artistas,posicion))
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    print("se demoro: ", time)
     return (num_artistas,primeras_3,ultimas_3)
 
 
 
 def dateArtwork(fecha_inicio,fecha_fin,catalogo):
+    start_time = chronos.process_time()
     fecha = fecha_inicio
     obras = lt.newList(datastructure="ARRAY_LIST")
     purchase = 0
@@ -370,10 +387,14 @@ def dateArtwork(fecha_inicio,fecha_fin,catalogo):
     ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
     for posicion in range(lt.size(obras)-3,lt.size(obras)):
         lt.addLast(ultimas_3,lt.getElement(obras,posicion))
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    print("se demoro: ", time)
     return (num_obras, purchase, primeras_3,ultimas_3)
 
 
 def departmentArtworks(catalogo,departamento):
+    start_time = chronos.process_time()
     aux = catalogo["Obra"]
     obras_depart = lt.newList()
     size = lt.size(aux)
@@ -471,19 +492,26 @@ def departmentArtworks(catalogo,departamento):
     lt.addLast(costosas_5,lt.getElement(obras_sorted,0))
     
     
-
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    print("se demoro: ", time)
     return cantidad,costo_total,peso_total,antiguas_5,costosas_5
 
 
 def encontrar_artista(catalogo,constituent_ID):
+    start_time = chronos.process_time()
     posicion = 0
     while posicion < lt.size(catalogo["Artista"]) and constituent_ID != lt.getElement(catalogo["Artista"],posicion)["ConstituentID"]:
         posicion += 1
     artista = lt.getElement(catalogo["Artista"],posicion)["DisplayName"]
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    print("se demoro: ", time)
     return artista
 
 
 def antiguedad_tecntica(catalogo,tecnica,top):
+    start_time = chronos.process_time()
     obras = mp.get(catalogo["medio"],tecnica)
     obras = obras["value"]
     
@@ -496,6 +524,9 @@ def antiguedad_tecntica(catalogo,tecnica,top):
         lt.addLast(aux,lt.getElement(obras_sorted,n))
         n+=1
 
+    stop_time = chronos.process_time()
+    time = (stop_time - start_time)*1000
+    print("se demoro: ", time)
     return obras
             
 
