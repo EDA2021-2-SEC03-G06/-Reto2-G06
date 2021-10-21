@@ -186,13 +186,13 @@ def ArtworkvArtist(nombre_artista,catalogo):
         obras = ma.getValue(mp.get(catalogo["Obras Artista"],nombre_artista))
         obras_totales = lt.size(obras)
         for obra in lt.iterator(obras):
-            if mp.contains(medios,obra["Medium"])==False:
-                obras_medio = lt.newList(datastructure="ARRAY_LIST")
-            else:
-                tupla = mp.get(obras,obra["Medium"])
-                obras_medio = ma.getValue(tupla)
-            lt.addLast(obras_medio,obra)
-            mp.put(medios,obra["Medium"],obras_medio)
+            if obra["Medium"] != "":
+                if mp.contains(medios,obra["Medium"])==False:
+                    obras_medio = lt.newList(datastructure="ARRAY_LIST")
+                else:
+                    obras_medio = ma.getValue(mp.get(medios,obra["Medium"]))
+                lt.addLast(obras_medio,obra)
+                mp.put(medios,obra["Medium"],obras_medio)
         total_medios = mp.size(medios)
         llaves = mp.keySet(medios)
         mayor = ""
@@ -201,12 +201,12 @@ def ArtworkvArtist(nombre_artista,catalogo):
             if lt.size(ma.getValue(mp.get(medios,medio))) > n_mayor:
                 mayor = medio
                 n_mayor = lt.size(ma.getValue(mp.get(medios,medio)))
-        if n_mayor > 3:
+        if n_mayor > 4:
             primeras_3 = lt.newList(datastructure="ARRAY_LIST")
             for posicion in range(1,4):
                 lt.addLast(primeras_3,lt.getElement(ma.getValue(mp.get(medios,mayor)),posicion))
             ultimas_3 = lt.newList(datastructure="ARRAY_LIST")
-            for posicion in range(lt.size(obras)-3,lt.size(obras)):
+            for posicion in range(lt.size(ma.getValue(mp.get(medios,mayor)))-2,lt.size(ma.getValue(mp.get(medios,mayor)))+1):
                 lt.addLast(ultimas_3,lt.getElement(ma.getValue(mp.get(medios,mayor)),posicion))
         else:
             primeras_3 = ma.getValue(mp.get(medios,mayor))
@@ -249,7 +249,7 @@ def artista_prolifico(num_artista,año_inicial,año_fina,catalogo):
         if mp.contains(medios,obra["Medium"])==False:
             obras_medio = lt.newList(datastructure="ARRAY_LIST")
         else:
-            tupla = mp.get(obras,obra["Medium"])
+            tupla = mp.get(medios,obra["Medium"])
             obras_medio = ma.getValue(tupla)
         lt.addLast(obras_medio,obra)
         mp.put(medios,obra["Medium"],obras_medio)
@@ -395,36 +395,26 @@ def dateArtwork(fecha_inicio,fecha_fin,catalogo):
 
 def departmentArtworks(catalogo,departamento):
     start_time = chronos.process_time()
-    aux = catalogo["Obra"]
-    obras_depart = lt.newList()
-    size = lt.size(aux)
-    cantidad = 0
-    n = 0
+    tupla = mp.get(catalogo["Departamento"],departamento)
+    obras = tupla["value"]
+    size = lt.size(obras)
 
-    while n <= size:
-        obra = lt.getElement(aux,n)
-        cmp_depart = obra["Department"]
-        if departamento==cmp_depart:
-            lt.addLast(obras_depart,obra)
-            cantidad+=1
-        n+=1
-    
+
     print("se han terminado de contabilizar las obras pertenecientes al departamento: "+departamento)
     print("se comenzará a calcular costos y pesos, por favor espere")
 
     n = 0
     peso_total = 0
     costo_total = 0
-    size = lt.size(obras_depart)
     while  n <= size:
-        obra = lt.getElement(obras_depart,n)
-        dimensiones = lt.newList()
+        obra = lt.getElement(obras,n)
+        dimensiones = lt.newList(datastructure="ARRAY_LIST")
         costo_medida = 1
         costo_peso = 0
         costo_obra = 0
         medidas = 1
         if obra["Weight (kg)"] != "":
-            peso_obra = float(obra["Weight  (kg)"])
+            peso_obra = float(obra["Weight (kg)"])
             costo_peso = peso_obra*72
             peso_total += peso_obra
 
@@ -438,11 +428,10 @@ def departmentArtworks(catalogo,departamento):
             medida = float(obra["Width (cm)"])/100
             lt.addLast(dimensiones,medida)
         lt.addLast(dimensiones,1)
-
         if lt.size(dimensiones) != 1:
             for i in range(lt.size(dimensiones)):
-                medidas*= lt.getElement(dimensiones,i)
-                costo_medida = medidas*72
+                medidas= lt.getElement(dimensiones,i)
+                costo_medida = medidas
 
         costos=lt.newList()
         lt.addLast(costos,costo_peso)
@@ -451,13 +440,14 @@ def departmentArtworks(catalogo,departamento):
             lt.addLast(costos,48)
 
         if (lt.size(dimensiones)==1) and (obra["Diameter (cm)"]!=""):
-            area_volumen =3.14*((float(obra["Diameter (cm)"])/200)^2)
+            diametro = float(obra["Diameter (cm)"])
+            area_volumen =3.14*((diametro/200)**2)
             if obra["Height (cm)"]!="":
-                area_volumen = area_volumen*(float(obra["Height (cm)"])/100)
+                area_volumen = area_volumen(float(obra["Height (cm)"])/100)
             costo_circular = area_volumen*72
-        lt.addLast(costos,costo_circular)
-                
-        
+            lt.addLast(costos,costo_circular)
+
+
 
         for i in range(lt.size(costos)+1):
             if lt.getElement(costos,i) > costo_obra:
@@ -467,13 +457,11 @@ def departmentArtworks(catalogo,departamento):
             costo_obra=48
         obra["costo"]=costo_obra
 
-        
-        n+=1
-    for i in range(lt.size(obras_depart)+1):
-        obra=lt.getElement(obras_depart,i)
-        print(obra["costo"])
 
-    obras_sorted = merge_sort(obras_depart,cantidad,compareData)
+        n+=1
+    for i in range(lt.size(obras)+1):
+        obra=lt.getElement(obras,i)
+        obras_sorted = merge_sort(obras,size,compareData)
     obras_sorted = obras_sorted[1]
     antiguas_5 = lt.newList()
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)))
@@ -481,8 +469,8 @@ def departmentArtworks(catalogo,departamento):
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)-2))
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)-3))
     lt.addLast(antiguas_5,lt.getElement(obras_sorted,lt.size(obras_sorted)-4))
-    
-    obras_sorted = merge_sort(obras_depart,cantidad,comparePrice)
+
+    obras_sorted = merge_sort(obras,size,compareData)
     obras_sorted = obras_sorted[1]
     costosas_5 = lt.newList()
     lt.addLast(costosas_5,lt.getElement(obras_sorted,4))
@@ -490,13 +478,14 @@ def departmentArtworks(catalogo,departamento):
     lt.addLast(costosas_5,lt.getElement(obras_sorted,2))
     lt.addLast(costosas_5,lt.getElement(obras_sorted,1))
     lt.addLast(costosas_5,lt.getElement(obras_sorted,0))
-    
-    
+
+ 
+
+
     stop_time = chronos.process_time()
     time = (stop_time - start_time)*1000
     print("se demoro: ", time)
-    return cantidad,costo_total,peso_total,antiguas_5,costosas_5
-
+    return size,costo_total,peso_total,antiguas_5,costosas_5
 
 def encontrar_artista(catalogo,constituent_ID):
     start_time = chronos.process_time()

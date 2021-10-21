@@ -324,7 +324,7 @@ while True:
         print("Se cargaron " + str(lt.size(catalogo["Artista"]))+" artistas")
         print("Se cargaron " + str(lt.size(catalogo["Obra"]))+" obras")
         """
-        
+         
     elif int(inputs) == 2:
         print(ejecutar_dateartist(catalogo))
     elif int(inputs) == 3:
